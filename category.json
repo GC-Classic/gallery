@@ -1,0 +1,27 @@
+{"category1":{
+    "-1":"S2 Runes",
+    "0":"Helmet",
+    "1":"Upper armor",
+    "2":"Lower armor",
+    "3":"Weapon",
+    "8":"Gloves",
+    "9":"Shoes",
+    "10":"Upper head accessory",
+    "11":"Lower head accessory",
+    "12":"Upper body accessory",
+    "13":"Cape",
+    "14":"Lower body accessory",
+    "15":"Arm accessory",
+    "16":"Ring",
+    "17":"Anklet",
+    "18":"Necklace",
+    "19":"Consumable",
+    "26":"Full body",
+    "50":"Pet",
+    "51":"Pet food",
+    "52":"Pet boost",
+    "53":"Pet skill",
+    "60":"Potion",
+    "62":"Card"
+}
+}

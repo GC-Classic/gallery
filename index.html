@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<meta charset=UTF-8>
+<meta name=viewport content='width=device-width,initial-scale=1'>
+<title>SQLite-Wasm</title>
+<link rel="stylesheet" href="https://gc-classic.github.io/common.css" crossorigin="anonymous">
+<link rel="stylesheet" href="index.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Monda:wght@700&amp;family=Shippori+Antique&amp;family=Sofia+Sans+Condensed:wght@600;800&amp;display=swap" rel="stylesheet">
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-FPLGF8M093"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FPLGF8M093');
+</script>
+
+<button id="delete" hidden>Reset</button>
+
+<form>
+  <fieldset id="char">
+    <label>All<input type="checkbox" value="all"></label>
+    <div></div>
+  </fieldset>
+</form>
+<button id="random">Random</button>
+<form><input type="search" placeholder="Search"></form>
+<dialog id="message"></dialog>
+
+<section id="result"></section>
+<dialog id="popup"></dialog>
+
+<script type="module">
+  let workerS, workerD, channel = new MessageChannel();
+
+  navigator.serviceWorker.register('workerS.js', {scope: location.pathname})
+  .then(({installing, active}) => {
+    workerS = installing ?? active;
+    workerS.postMessage('', [channel.port1]);
+    workerD = new Worker(`workerD.js?sqlite3.dir=jswasm&key=${window.location.hash.substring(1)}`);
+    workerD.postMessage('', [channel.port2]);
+    workerD.addEventListener('message', ev => initResult(ev.data));
+  }).catch(console.error);
+
+  import {Q} from 'https://aeoq.github.io/AEOQ.mjs'
+  const initResult = message => {
+    let messageBox = Q('#message');
+    if (typeof message == 'string' || typeof message == 'number')
+      return messageBox.textContent = message;
+
+    if (message.error) {
+      messageBox.textContent = `Error: ${message.error}`;
+      throw message.error;
+    }
+    message.done && (messageBox.textContent = message.done);
+  }
+
+</script>
+<script type="module">
+  import {Form, Query} from './index.js'
+  Form.init();
+  Form.events();
+  Query.events();
+</script>

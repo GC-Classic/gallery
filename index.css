@@ -1,0 +1,117 @@
+html {
+    background:#2e3664;
+    padding-top:5em;    
+}
+@keyframes fade {
+    0%,50% {opacity:1;}
+    100% {opacity:0;}
+}
+#message {
+    display:none;
+    position:fixed; top:50%; transform:translateY(-50%); z-index:2;
+    background:#00000099;
+    padding:1em 0;
+    width:100%;
+    text-align:center;
+
+    &[open] {
+        display:initial;
+        animation:fade 2s forwards;
+        opacity:1;
+    }
+    &::backdrop {background:none;}
+}
+form:first-of-type {
+    position:fixed; top:0; z-index:1;
+    background:#000000dd;
+    max-width:100%;
+
+    label:has(:not(:checked)) {filter:saturate(0) brightness(.5);}
+
+    fieldset {
+        display:flex;
+
+        >label {
+            line-height:2em; height:2em;
+            padding:0 .5em; margin-left:.25em;
+            border:.1em solid; border-radius:.25em;
+        }
+        div {
+            white-space:nowrap; overflow-x:scroll;
+            scrollbar-width:none;
+            padding-left:.25em;
+
+            label {
+                height:2em; display:inline-block;
+                &::before {content:attr(title)}
+            }
+        }
+    }
+}
+#char div label {
+    width:2em; 
+    background:url(char.png) calc(1% + 13.85%*(var(--x))) calc(1% + 21%*var(--y)) / 950%;
+
+    &:has(input[value='0']) {--x:0;--y:0;}
+    &:has(input[value='1']) {--x:1;--y:0;}
+    &:has(input[value='2']) {--x:2;--y:0;}
+    &:has(input[value='3']) {--x:3;--y:0;}
+    &:has(input[value='4']) {--x:4;--y:0;}
+    &:has(input[value='5']) {--x:5;--y:0;}
+    &:has(input[value='6']) {--x:6;--y:0;}
+    &:has(input[value='7']) {--x:7;--y:0;}
+    &:has(input[value='8']) {--x:0;--y:1;}
+    &:has(input[value='9']) {--x:1;--y:1;}
+    &:has(input[value='10']) {--x:2;--y:1;}
+    &:has(input[value='11']) {--x:3;--y:1;}
+    &:has(input[value='12']) {--x:4;--y:1;}
+    &:has(input[value='13']) {--x:5;--y:1;}
+    &:has(input[value='14']) {--x:6;--y:1;}
+    &:has(input[value='15']) {--x:7;--y:1;}
+    &:has(input[value='16']) {--x:0;--y:2;}
+    &:has(input[value='17']) {--x:1;--y:2;}
+    &:has(input[value='18']) {--x:2;--y:2;}
+    &:has(input[value='19']) {--x:3;--y:2;}
+}
+#category1 div label {
+    line-height:2em;
+    margin:0 .25em;
+}
+button {
+    border-radius:9em;
+    background:var(--fg);
+    padding:0 .5em; margin-right:.5em;
+    color:var(--bg);
+}
+form:last-of-type {
+    display:inline;
+    
+    input {font-size:1.1em;}
+}
+
+#result figure {
+    display:inline-block;
+
+    &:has(figcaption:only-child) {display:none;}
+    figcaption {
+        font-size:.6em; color:silver;
+        margin-top:-.5em;
+    }
+    img {
+        width:3em;
+        -webkit-user-drag: none;
+    }
+}
+#popup {
+    display:none; justify-content:center; align-items:center;
+    min-width:100%; min-height:100%;
+    background:none;
+
+    &[open] {display:flex;}
+    img {
+        width:12em;
+        background:var(--fg); 
+        padding:1em;
+        border-radius:.5em;
+    }
+}
