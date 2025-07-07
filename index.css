@@ -8,10 +8,10 @@ html {
 }
 #message {
     display:none;
-    position:fixed; top:50%; transform:translateY(-50%); z-index:2;
+    position:fixed; top:50%; left:0; transform:translateY(-50%); z-index:2;
     background:#00000099;
     padding:1em 0;
-    width:100%;
+    min-width:100vw;
     text-align:center;
 
     &[open] {

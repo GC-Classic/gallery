@@ -84,15 +84,12 @@ const Query = href =>
             if (re.length === 0)
                 return Q('#message').textContent = 'NO MORE RESULT'
 
-            Q('#result')[href ? 'replaceChildren' : 'append'](...re.map(({ ID }) => 
-                E('figure', {
-                    style: {
-                        backgroundImage: `url(https://gc-classic.github.io/item/sprite/${Math.floor(ID / 1000) * 100}.png),
-                            linear-gradient(var(--bg),var(--bg))`,
-                    },
-                    '--x': (ID/10)%10, '--y': Math.floor((ID/10)%100/10)
-                }, [E('figcaption', ID / 10)])
-            ));
+            Q('#result')[href ? 'replaceChildren' : 'append'](...re.map(({ ID }) => E('figure', {
+                style: {
+                    backgroundImage: `url(https://gc-classic.github.io/item/sprite/${Math.floor(ID / 1000) * 100}.png),linear-gradient(var(--bg),var(--bg))`,
+                },
+                '--x': (ID / 10) % 10, '--y': Math.floor((ID / 10) % 100 / 10)
+            }, [E('figcaption', ID / 10)])));
             Query.offset(re.at(-1).ID);
         })
         .catch(er => [console.error(er), Q('#message').textContent = er.toString()]);  
