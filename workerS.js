@@ -23,6 +23,9 @@ const Routes = {
         ).catch(er => console.error(er)),
 
     headers: req => {
+        if (req.url.includes('gc-classic.github.io/item')) 
+            return fetch(new Request(req, {mode: 'cors', credentials: 'omit'}))
+            .then(res => new Response(res.body));
         if (req.cache === 'only-if-cached' && req.mode !== 'same-origin') return;
         return fetch(req).then(res => {
             if (res.status === 0) return res;

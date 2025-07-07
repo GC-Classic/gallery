@@ -4,11 +4,11 @@ import PointerInteraction from 'https://aeoq.github.io/pointer-interaction/scrip
 const Form = {
     el: document.forms[0],
     debounce: false,
+    multi: false,
     init () {
         fetch('./category.json').then(resp => resp.json())
             .then(json => Form.el.append(...Object.entries(json).map(([name, values]) => 
                 E('fieldset', {id: name}, [
-                    E('label', ['All', E('input', {type: 'checkbox', value: 'all'})]),
                     E('div', E.checkboxes(Array.isArray(values) ? 
                         values.map(c => ({name, value: c, title: `${c}`}) ) : 
                         Object.entries(values).map(([c, title]) => ({name, value: c, title}) ))
@@ -20,10 +20,8 @@ const Form = {
     events () {
         Form.el.onchange = ev => {
             Query.offset(0);
-            ev.target.value == 'all' 
-                && ev.target.closest('fieldset').Q('div input', input => input.checked = ev.target.checked);
-            ev.target.matches('fieldset div input') && !ev.target.checked 
-                && (ev.target.closest('fieldset').Q('[value=all]').checked = false);
+            ev.target.matches('fieldset div input') && ev.target.checked && !Form.multi 
+                && ev.target.closest('fieldset').Q('div input', input => input.checked = input == ev.target);
 
             let params = Object.entries(
                 [...new FormData(Form.el)].reduce((obj, [name, value]) => ({...obj, [name]: `${obj[name] ?? ''}${value},`}), {})
@@ -41,10 +39,10 @@ const Form = {
         Q('#delete').onclick = () => Query(`api/reset/`);
         PointerInteraction.events({
             'fieldset div': {drag: PI => PI.drag.to.scroll({x: true, y: false})},
-            '#result img': {
+            '#result figure': {
                 drag: PI => {
                     if (PI.target.downloaded || PI.$drag.x - PI.$press.x > -50) return; 
-                    Image.download(PI.target.src, PI.target.alt + '.png');
+                    Image.download(PI.target);
                     PI.target.downloaded = true;
                 },
                 hold: hold => hold.for(.5).to((_, target) => {
@@ -54,14 +52,28 @@ const Form = {
                 lift: () => popup.close()
             }
         });
+        addEventListener('keydown', ev => ev.key == 'Control' && (Form.multi = true));
+        addEventListener('keyup', ev => ev.key == 'Control' && (Form.multi = false));
     }
 }
 const Image = {
     popup: Q('#popup'),
-    download: (src, file) => 
-        fetch(src, {mode: 'cors'})
-        .then(resp => resp.blob())
-        .then(blob => E('a', {href: URL.createObjectURL(blob), download: file}).click())
+    download: figure => {
+        const canvas = E('canvas', {width: 128, height: 128});
+        E('img', {
+            src: figure.style.backgroundImage.match(/https.+?png/)[0],
+            onload: ev => {
+                canvas.getContext('2d').drawImage(ev.target, 
+                    E(figure).get('--x')*128, E(figure).get('--y')*128, 128, 128, 
+                    0, 0, 128, 128
+                );
+                E('a', {
+                    href: canvas.toDataURL('image/png'),
+                    download: figure.Q('figcaption').textContent + '.png'
+                }).click()
+            }
+        })
+    }
 }
 
 const Query = href =>
@@ -73,14 +85,14 @@ const Query = href =>
                 return Q('#message').textContent = 'NO MORE RESULT'
 
             Q('#result')[href ? 'replaceChildren' : 'append'](...re.map(({ ID }) => 
-                E('figure', [
-                    E('img', {
-                        crossOrigin: 'anonymous',
-                        src: `https://gc-classic.github.io/item/${Math.ceil(ID / 200000) * 20}/sbta${ID / 10}.png`,
-                    }),
-                    E('figcaption', ID / 10)
-                ]))
-            );
+                E('figure', {
+                    style: {
+                        backgroundImage: `url(https://gc-classic.github.io/item/sprite/${Math.floor(ID / 1000) * 100}.png),
+                            linear-gradient(var(--bg),var(--bg))`,
+                    },
+                    '--x': (ID/10)%10, '--y': Math.floor((ID/10)%100/10)
+                }, [E('figcaption', ID / 10)])
+            ));
             Query.offset(re.at(-1).ID);
         })
         .catch(er => [console.error(er), Q('#message').textContent = er.toString()]);  

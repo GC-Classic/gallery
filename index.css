@@ -25,31 +25,27 @@ form:first-of-type {
     position:fixed; top:0; z-index:1;
     background:#000000dd;
     max-width:100%;
+    padding-bottom:.25em;
 
     label:has(:not(:checked)) {filter:saturate(0) brightness(.5);}
 
     fieldset {
         display:flex;
 
-        >label {
-            line-height:2em; height:2em;
-            padding:0 .5em; margin-left:.25em;
-            border:.1em solid; border-radius:.25em;
-        }
         div {
             white-space:nowrap; overflow-x:scroll;
             scrollbar-width:none;
             padding-left:.25em;
 
             label {
-                height:2em; display:inline-block;
+                display:inline-block;
                 &::before {content:attr(title)}
             }
         }
     }
 }
 #char div label {
-    width:2em; 
+    width:2em; height:2em;
     background:url(char.png) calc(1% + 13.85%*(var(--x))) calc(1% + 21%*var(--y)) / 950%;
 
     &:has(input[value='0']) {--x:0;--y:0;}
@@ -74,7 +70,6 @@ form:first-of-type {
     &:has(input[value='19']) {--x:3;--y:2;}
 }
 #category1 div label {
-    line-height:2em;
     margin:0 .25em;
 }
 button {
@@ -88,18 +83,18 @@ form:last-of-type {
     
     input {font-size:1.1em;}
 }
-
+figure {
+    background-size:1000%;
+    background-position:calc(100%/9*var(--x)) calc(100%/9*var(--y));
+}
 #result figure {
-    display:inline-block;
+    display:inline-flex; justify-content:center; align-items:end;
+    width:3em; height:3em;
+    --bg:transparent;
 
-    &:has(figcaption:only-child) {display:none;}
     figcaption {
         font-size:.6em; color:silver;
-        margin-top:-.5em;
-    }
-    img {
-        width:3em;
-        -webkit-user-drag: none;
+        line-height:0;
     }
 }
 #popup {
@@ -108,10 +103,10 @@ form:last-of-type {
     background:none;
 
     &[open] {display:flex;}
-    img {
-        width:12em;
-        background:var(--fg); 
+    figure {
+        width:12em; height:12em;
         padding:1em;
         border-radius:.5em;
+        --bg:white;
     }
 }
