@@ -24,7 +24,7 @@ const DB = {
 const API = url => {
     let {pathname, search, hash} = new URL(url);
     search &&= [...new URLSearchParams(search)].map(([name, value]) => `${name} in (${value}'x')`).join(' and ');
-    hash &&= `and id>=${hash.substring(1)}`;
+    hash &&= `and id>${hash.substring(1)}`;
     let text = /[^/]+$/.exec(pathname)?.[0];
     let sql;
     try {
