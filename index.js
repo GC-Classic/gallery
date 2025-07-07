@@ -105,6 +105,7 @@ Object.assign(Query, {
         );
     }
 });
+oncontextmenu = ev => ev.preventDefault();
 new MutationObserver(([{ target }], observer) => {
     if (target.textContent) {
         target.showModal();
