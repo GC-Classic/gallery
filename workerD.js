@@ -29,17 +29,19 @@ const API = url => {
     let sql;
     try {
         if (url.includes('api/reset/'))
-            return workerS.postMessage(DB.discard() && 'deleted');
+            return workerS.postMessage(DB.discard() && 'Deleted');
         if (url.includes('api/?'))
-            sql = `SELECT id from item where ${search} ${hash} limit 500`;
+            sql = `SELECT id from item where ${search} ${hash} and image=1 limit 500`;
         else if (url.includes('api/search/'))
             sql = /^[,\d]+$/.test(text) ? 
             `SELECT id from item where id in (${text})` :
-            `SELECT id from item where (name like '%${text}%' or desc like '%${text}%') ${hash} limit 500`;
+            `SELECT id from item where (name like '%${text}%' or desc like '%${text}%') ${hash} and image=1 limit 500`;
         else if (url.includes('api/random/'))
-            sql = `SELECT id from item order by random() limit 500`;
+            sql = `SELECT id from item where image=1 order by random() limit 500`;
         else if (url.includes('sql/'))
-            sql = decodeURIComponent(url.match(/(?<=sql\/).+/)) + ' limit 500';
+            sql = decodeURIComponent(url.match(/(?<=sql\/).+/)) 
+                + (url.includes('where') ? 'and' : 'where') + ' image=1' 
+                + ' limit 500';
         workerS.postMessage(DB.SQL(sql));
     }
     catch (er) {

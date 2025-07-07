@@ -69,7 +69,7 @@ form:first-of-type {
     &:has(input[value='18']) {--x:2;--y:2;}
     &:has(input[value='19']) {--x:3;--y:2;}
 }
-#category1 div label {
+#category div label {
     margin:0 .25em;
 }
 button {

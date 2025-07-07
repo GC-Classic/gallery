@@ -86,10 +86,10 @@ const Query = href =>
 
             Q('#result')[href ? 'replaceChildren' : 'append'](...re.map(({ ID }) => E('figure', {
                 style: {
-                    backgroundImage: `url(https://gc-classic.github.io/item/sprite/${Math.floor(ID / 1000) * 100}.png),linear-gradient(var(--bg),var(--bg))`,
+                    backgroundImage: `url(https://gc-classic.github.io/item/sprite/${Math.floor(ID / 100) * 100}.png),linear-gradient(var(--bg),var(--bg))`,
                 },
-                '--x': (ID / 10) % 10, '--y': Math.floor((ID / 10) % 100 / 10)
-            }, [E('figcaption', ID / 10)])));
+                '--x': ID % 10, '--y': Math.floor(ID % 100 / 10)
+            }, [E('figcaption', ID)])));
             Query.offset(re.at(-1).ID);
         })
         .catch(er => [console.error(er), Q('#message').textContent = er.toString()]);  
