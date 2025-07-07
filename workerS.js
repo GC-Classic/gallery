@@ -2,7 +2,10 @@ self.addEventListener('install', ev => self.skipWaiting());
 self.addEventListener('activate', ev => ev.waitUntil(clients.claim()));
 self.addEventListener('fetch', ev => ev.respondWith(
     /(?:api|sql)\//.test(new URL(ev.request.url).pathname) ? 
-        Routes.DB(ev.request.url) : Routes.headers(ev.request)
+        Routes.DB(ev.request.url) : 
+    ev.request.url.includes('/item') ?
+        Routes.cors(ev.request) :
+        Routes.headers(ev.request)
 ));
 
 self.onmessage = ev => workerD = Object.assign(ev.ports[0], {
@@ -23,9 +26,6 @@ const Routes = {
         ).catch(er => console.error(er)),
 
     headers: req => {
-        if (req.url.includes('gc-classic.github.io/item')) 
-            return fetch(new Request(req, {mode: 'cors', credentials: 'omit'}))
-            .then(res => new Response(res.body));
         if (req.cache === 'only-if-cached' && req.mode !== 'same-origin') return;
         return fetch(req).then(res => {
             if (res.status === 0) return res;
@@ -34,5 +34,6 @@ const Routes = {
             headers.set('Cross-Origin-Opener-Policy', 'same-origin');
             return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
         });
-    }
+    },
+    cors: req => fetch(new Request(req, {mode: 'cors', credentials: 'omit'})).then(res => new Response(res.body))
 }

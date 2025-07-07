@@ -48,6 +48,7 @@
       return messageBox.textContent = message;
 
     if (message.error) {
+      message.error.toString().includes('oo1') && location.reload();
       messageBox.textContent = `Error: ${message.error}`;
       throw message.error;
     }
