@@ -39,7 +39,7 @@ const API = url => {
         else if (url.includes('api/random/'))
             sql = `SELECT id from item where image=1 order by random() limit 500`;
         else if (url.includes('sql/'))
-            sql = decodeURIComponent(url.match(/(?<=sql\/).+/)) 
+            sql = decodeURIComponent(pathname.match(/(?<=sql\/).+/)) 
                 + (url.includes('where') ? ' and' : ' where') + ' image=1 limit 500';
         workerS.postMessage(DB.SQL(sql));
     }
