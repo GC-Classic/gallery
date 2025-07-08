@@ -26,7 +26,14 @@
 <form><input type="search" placeholder="Search"></form>
 <dialog id="message"></dialog>
 
-<section id="result"></section>
+<div style="display:flex">
+<section id="result" style="flex-grow: 1;"></section>
+<div style="display:flex;flex-direction: column;">
+  <textarea style="height:20em"></textarea>
+  <button id="commit">COMMIT</button>
+  <textarea style="height:20em"></textarea>
+</div>
+</div>
 <dialog id="popup"></dialog>
 
 <script type="module">

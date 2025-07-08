@@ -52,9 +52,18 @@ const Form = {
                 lift: () => popup.close()
             }
         });
-        addEventListener('keydown', ev => ev.key == 'Control' && (Form.multi = true));
-        addEventListener('keyup', ev => ev.key == 'Control' && (Form.multi = false));
+        addEventListener('keydown', ev => ev.key == 'Control' ? Form.multi = true : ev.key == 'Shift' ? Query.shift = true :
+            /^[0-9]$/.test(ev.key) ? update(ev.key) : ev.key == 'Backspace' ? update() : ''
+        );
+        addEventListener('keyup', ev => ev.key == 'Control' ? Form.multi = false : ev.key == 'Shift' ? Query.shift = false : '');
     }
+}
+const update = numeric => {
+    let cat = Q('figure:nth-child(1 of .selected)').dataset.cat ?? '';
+    cat = numeric ? cat + numeric : cat.slice(0, -1);
+    Q('figure.selected', figure => figure.dataset.cat = cat);
+    let selected = [...document.querySelectorAll('figure.selected')];
+    Q('textarea:first-of-type').textContent = `update item set category=${cat} where id in (${selected.map(figure=>figure.id)});`
 }
 const Image = {
     popup: Q('#popup'),
@@ -85,6 +94,7 @@ const Query = href =>
                 return Q('#message').textContent = 'NO MORE RESULT'
 
             Q('#result')[href ? 'replaceChildren' : 'append'](...re.map(({ ID }) => E('figure', {
+                id: ID,
                 style: {
                     backgroundImage: `url(https://gc-classic.github.io/item/sprite/${Math.floor(ID / 100) * 100}.png),linear-gradient(var(--bg),var(--bg))`,
                 },
@@ -97,6 +107,7 @@ const Query = href =>
 Object.assign(Query, {
     offset: id => id ? Form.el.dataset.offset = id : Form.el.dataset.offset,
     cooldown: false,
+    shift: false,
     events () {
         addEventListener('scroll', () => 
             pageYOffset + innerHeight >= document.documentElement.scrollHeight - 2
@@ -112,5 +123,27 @@ new MutationObserver(([{ target }], observer) => {
         clearTimeout(observer.timer);
         observer.timer = setTimeout(() => [target.textContent = '', target.close()], 2000)
     }
-}).observe(Q('#message'), { childList: true })
+}).observe(Q('#message'), { childList: true });
+
+Q('#result').addEventListener('click', ev => {
+    let [figures, selected] = [[...Q('#result').children], [...document.querySelectorAll('#result .selected')]];
+    if (Query.shift && selected.length >= 1) {
+        let current = figures.indexOf(ev.target);
+        let [start, end] = [figures.indexOf(selected[0]), figures.indexOf(selected.at(-1))];
+        let to = start <= current && end <= current ? start : start > current && end > current ? end : null;
+        figures.slice(Math.min(to, current), Math.max(to, current)).forEach(figure => figure.classList.add('selected'));
+    } else if (!Form.multi && !Query.shift)
+        Q('#result .selected', figure => figure != ev.target && figure.classList.remove('selected'));
+    ev.target.classList.toggle('selected'); 
+});
+Q('#commit').onclick = ev => {
+    //Query(`sql/${Q('textarea:first-of-type').textContent}`);
+    Q('textarea:last-of-type').textContent += Q('textarea:first-of-type').textContent;
+    Q('textarea:first-of-type').textContent = '';
+    Q('figure.selected', figure => figure.remove());
+}
+addEventListener('beforeunload', (event) => {
+    event.preventDefault(); // Needed for Chrome
+    event.returnValue = ''; // Triggers the popup
+});
 export {Form, Query};

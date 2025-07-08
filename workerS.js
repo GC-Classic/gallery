@@ -7,8 +7,10 @@ self.addEventListener('fetch', ev => ev.respondWith(
         Routes.cors(ev.request) :
         Routes.headers(ev.request)
 ));
+self.onmessage = ev => connect(port = ev.ports[0]);
 
-self.onmessage = ev => workerD = Object.assign(ev.ports[0], {
+let workerD, port;
+let connect = () => workerD = Object.assign(port, {
     query: url => new Promise(res => {
         workerD.postMessage(url);
         workerD.addEventListener('message', ev => res(ev.data), {once: true});
@@ -16,10 +18,8 @@ self.onmessage = ev => workerD = Object.assign(ev.ports[0], {
     onmessage: ev => {},
 });
 
-let workerD;
-
 const Routes = {
-    DB: url => workerD.query(url)
+    DB: url => (workerD ??= connect()).query(url)
         .then(data => typeof data == 'number' ? new Response('', { status: data }) : 
             Function.prototype.call.bind(Object.prototype.toString)(data) == '[object Error]' ?
                 new Response(data, { status: 500 }) : new Response(JSON.stringify(data))

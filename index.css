@@ -91,6 +91,7 @@ figure {
     display:inline-flex; justify-content:center; align-items:end;
     width:3em; height:3em;
     --bg:transparent;
+    touch-action:none;
 
     figcaption {
         font-size:.6em; color:silver;
@@ -108,5 +109,15 @@ figure {
         padding:1em;
         border-radius:.5em;
         --bg:white;
+    }
+}
+figure.selected {
+    border:.1em solid;
+    position:relative;
+
+    &[data-cat]::before {
+        content:attr(data-cat);
+        position:absolute; left:0; top:0;
+        font-size:2em;
     }
 }
