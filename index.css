@@ -91,7 +91,7 @@ figure {
     display:inline-flex; justify-content:center; align-items:end;
     width:3em; height:3em;
     --bg:transparent;
-    touch-action:none;
+    touch-action:pan-y;
 
     figcaption {
         font-size:.6em; color:silver;
