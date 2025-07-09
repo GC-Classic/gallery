@@ -86,7 +86,7 @@ const Image = {
 }
 
 const Query = href =>
-    fetch(href ? Query.last = href : `${Query.last}#${Query.offset()}`).then(resp => resp.json())
+    fetch(/update/i.test(href) ? href : href ? Query.last = href : `${Query.last}#${Query.offset()}`).then(resp => resp.json())
         .then(re => {
             if (typeof re == 'string' || typeof re == 'number')
                 return Q('#message').textContent = re;
@@ -137,7 +137,7 @@ Q('#result').addEventListener('click', ev => {
     ev.target.classList.toggle('selected'); 
 });
 Q('#commit').onclick = ev => {
-    //Query(`sql/${Q('textarea:first-of-type').textContent}`);
+    Query(`sql/${Q('textarea:first-of-type').textContent}`);
     Q('textarea:last-of-type').textContent += Q('textarea:first-of-type').textContent;
     Q('textarea:first-of-type').textContent = '';
     Q('figure.selected', figure => figure.remove());

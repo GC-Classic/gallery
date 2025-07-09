@@ -1,4 +1,12 @@
 {"category":{
+    "99":"Skill",
+    "98":"Mission",
+    "97":"Material",
+    "96":"Reinforce",
+    "95":"Pet",
+    "94":"Package",
+    "93":"Earring",
+    "92":"Choice box",
     "-1":"S2 Runes",
     "0":"Helmet",
     "1":"Upper armor",
@@ -19,8 +27,6 @@
     "26":"Full body",
     "50":"Pet",
     "51":"Pet food",
-    "52":"Pet boost",
-    "53":"Pet skill",
     "60":"Potion",
     "62":"Card"
 }
