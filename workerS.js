@@ -4,10 +4,10 @@ self.addEventListener('fetch', ev => ev.respondWith(
     /(?:api|sql)\//.test(new URL(ev.request.url).pathname) ? 
         Routes.DB(ev.request.url) : 
     ev.request.url.includes('/item') ?
-        Routes.cors(ev.request) :
+        fetch(ev.request.url.replace('https://gc-classic.github.io', '')) : 
         Routes.headers(ev.request)
 ));
-self.onmessage = ev => connect(port = ev.ports[0]);
+self.onmessage = ev => console.log(ev.ports[0])??connect(port = ev.ports[0]);
 
 let workerD, port;
 let connect = () => workerD = Object.assign(port, {

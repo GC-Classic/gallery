@@ -31,13 +31,13 @@ const API = url => {
         if (url.includes('api/reset/'))
             return workerS.postMessage(DB.discard() && 'Deleted');
         if (url.includes('api/?'))
-            sql = `SELECT id from item where ${search} ${hash} and image=1 limit 500`;
+            sql = `select * from item where ${search} ${hash} and image=1 limit 500`;
         else if (url.includes('api/search/'))
             sql = /^[,\d]+$/.test(text) ? 
-            `SELECT id from item where id in (${text})` :
-            `SELECT id from item where (name like '%${text}%' or desc like '%${text}%') ${hash} and image=1 limit 500`;
+            `select * from item where id in (${text})` :
+            `select * from item where (name like '%${text}%' or desc like '%${text}%') ${hash} and image=1 limit 500`;
         else if (url.includes('api/random/'))
-            sql = `SELECT id from item where image=1 order by random() limit 500`;
+            sql = `select * from item where image=1 order by random() limit 500`;
         else if (url.includes('sql/'))
             sql = decodeURIComponent(pathname.match(/(?<=sql\/).+/)) 
                 + (url.includes('select') ? url.includes('where') ? ' and' : ' where' : '')

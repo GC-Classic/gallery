@@ -31,8 +31,9 @@ const Form = {
         document.forms[1].oninput = ev => {
             if (ev.target.value.length <= 1) return;
             clearTimeout(Form.debounce);
-            Form.debounce = setTimeout(() => 
-                Query(/^select /i.test(ev.target.value) ? `sql/${ev.target.value}` : `api/search/${ev.target.value}`)
+            Form.debounce = setTimeout(() => Query(
+                /^#[\d,]+/.test(ev.target.value) ? `sql/select * from item where id in (${/^#([\d,]+)(.*)$/.exec(ev.target.value)[1]}) and ${/^#([\d,]+)(.*)$/.exec(ev.target.value)[2] || 'true'}` :
+                /^select /i.test(ev.target.value) ? `sql/${ev.target.value}` : `api/search/${ev.target.value}`)
             , 1000)
         }
         Q('#random').onclick = () => Query(`api/random/`)
@@ -93,13 +94,14 @@ const Query = href =>
             if (re.length === 0)
                 return Q('#message').textContent = 'NO MORE RESULT'
 
-            Q('#result')[href ? 'replaceChildren' : 'append'](...re.map(({ ID }) => E('figure', {
+            Q('#result')[href ? 'replaceChildren' : 'append'](...re.map(({ ID, category, name, desc }) => E('figure', {
                 id: ID,
                 style: {
                     backgroundImage: `url('https://gc-classic.github.io/item/sprite/${Math.floor(ID / 100) * 100}.png'),linear-gradient(var(--bg),var(--bg))`,
                 },
+                title: name + '\n' + desc,
                 '--x': ID % 10, '--y': Math.floor(ID % 100 / 10)
-            }, [E('figcaption', ID)])));
+            }, [E('figcaption', `${ID}.${category}`)])));
             Query.offset(re.at(-1).ID);
         })
         .catch(er => [console.error(er), Q('#message').textContent = er.toString()]);  
