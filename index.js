@@ -7,15 +7,23 @@ const Form = {
     multi: false,
     init () {
         fetch('./category.json').then(resp => resp.json())
-            .then(json => Form.el.append(...Object.entries(json).map(([name, values]) => 
-                E('fieldset', {id: name}, [
-                    E('div', E.checkboxes(Array.isArray(values) ? 
-                        values.map(c => ({name, value: c, title: `${c}`}) ) : 
-                        Object.entries(values).map(([c, title]) => ({name, value: c, title}) ))
-                    )
-                ])
-            )));
-        Form.el.Q('#char div').append(...E.checkboxes([...Array(20)].map((_, i) => ({name: 'char', value: i}) )));
+        .then(json => Form.el.append(...Object.entries(json).map(([name, values]) => 
+            E('fieldset', {id: name}, [
+                E('div', E.checkboxes(Array.isArray(values) ? 
+                    values.map(c => ({name, value: c, title: `${c}`}) ) : 
+                    Object.entries(values).map(([c, title]) => ({name, value: c, title}) ))
+                )
+            ])
+        )));
+        Form.el.Q('#char div').append(...[...Array(20)].map((_, i) => 
+            E('label', {
+                classList: 'char',
+                '--x': i % 8, '--y': Math.floor(i / 8)
+            }, [E('input', {
+                name: 'char', value: i,
+                type: 'checkbox'
+            })])
+        ));
     },
     events () {
         Form.el.onchange = ev => {
@@ -47,24 +55,20 @@ const Form = {
                     PI.target.downloaded = true;
                 },
                 hold: hold => hold.for(.5).to((_, target) => {
-                    Image.popup.replaceChildren(target.cloneNode());
+                    let char = parseInt(target.dataset.char), figure = target.cloneNode();
+                    Image.popup.replaceChildren(figure);
+                    char != -1 && figure.append(E('i', {
+                        classList: 'char', 
+                        '--x': char % 8, '--y': Math.floor(char / 8)    
+                    }));
                     Image.popup.showModal();
                 }),
                 lift: () => popup.close()
             }
         });
-        addEventListener('keydown', ev => ev.key == 'Control' ? Form.multi = true : ev.key == 'Shift' ? Query.shift = true :
-            /^[0-9]$/.test(ev.key) ? update(ev.key) : ev.key == 'Backspace' ? update() : ''
-        );
-        addEventListener('keyup', ev => ev.key == 'Control' ? Form.multi = false : ev.key == 'Shift' ? Query.shift = false : '');
+        addEventListener('keydown', ev => ev.key == 'Control' ? Form.multi = true :  '');
+        addEventListener('keyup', ev => ev.key == 'Control' ? Form.multi = false : '');
     }
-}
-const update = numeric => {
-    let cat = Q('figure:nth-child(1 of .selected)').dataset.cat ?? '';
-    cat = numeric ? cat + numeric : cat.slice(0, -1);
-    Q('figure.selected', figure => figure.dataset.cat = cat);
-    let selected = [...document.querySelectorAll('figure.selected')];
-    Q('textarea:first-of-type').textContent = `update item set category=${cat} where id in (${selected.map(figure=>figure.id)});`
 }
 const Image = {
     popup: Q('#popup'),
@@ -88,28 +92,28 @@ const Image = {
 
 const Query = href =>
     fetch(/update/i.test(href) ? href : href ? Query.last = href : `${Query.last}#${Query.offset()}`).then(resp => resp.json())
-        .then(re => {
-            if (typeof re == 'string' || typeof re == 'number')
-                return Q('#message').textContent = re;
-            if (re.length === 0)
-                return Q('#message').textContent = 'NO MORE RESULT'
+    .then(re => {
+        if (typeof re == 'string' || typeof re == 'number')
+            return Q('#message').textContent = re;
+        if (re.length === 0)
+            return Q('#message').textContent = 'NO MORE RESULT'
 
-            Q('#result')[href ? 'replaceChildren' : 'append'](...re.map(({ ID, category, name, desc }) => E('figure', {
-                id: ID,
-                style: {
-                    backgroundImage: `url('https://gc-classic.github.io/item/sprite/${Math.floor(ID / 100) * 100}.png'),linear-gradient(var(--bg),var(--bg))`,
-                },
-                title: name + '\n' + desc,
-                '--x': ID % 10, '--y': Math.floor(ID % 100 / 10)
-            }, [E('figcaption', `${ID}.${category}`)])));
-            Query.offset(re.at(-1).ID);
-        })
-        .catch(er => [console.error(er), Q('#message').textContent = er.toString()]);  
+        Q('#result')[href ? 'replaceChildren' : 'append'](...re.map(({ ID, char, name, desc }) => E('figure', {
+            id: ID,
+            dataset: {char},
+            title: name + '\n' + desc,
+            '--x': ID % 10, '--y': Math.floor(ID % 100 / 10),
+            style: {
+                backgroundImage: `url('https://gc-classic.github.io/item/sprite/${Math.floor(ID / 100) * 100}.png'),linear-gradient(var(--bg),var(--bg))`,
+            },
+        }, [E('figcaption', ID)])));
+        Query.offset(re.at(-1).ID);
+    })
+    .catch(er => [console.error(er), Q('#message').textContent = er.toString()]);  
 
 Object.assign(Query, {
     offset: id => id ? Form.el.dataset.offset = id : Form.el.dataset.offset,
     cooldown: false,
-    shift: false,
     events () {
         addEventListener('scroll', () => 
             pageYOffset + innerHeight >= document.documentElement.scrollHeight - 2
@@ -127,25 +131,4 @@ new MutationObserver(([{ target }], observer) => {
     }
 }).observe(Q('#message'), { childList: true });
 
-Q('#result').addEventListener('click', ev => {
-    let [figures, selected] = [[...Q('#result').children], [...document.querySelectorAll('#result .selected')]];
-    if (Query.shift && selected.length >= 1) {
-        let current = figures.indexOf(ev.target);
-        let [start, end] = [figures.indexOf(selected[0]), figures.indexOf(selected.at(-1))];
-        let to = start <= current && end <= current ? start : start > current && end > current ? end : null;
-        figures.slice(Math.min(to, current), Math.max(to, current)).forEach(figure => figure.classList.add('selected'));
-    } else if (!Form.multi && !Query.shift)
-        Q('#result .selected', figure => figure != ev.target && figure.classList.remove('selected'));
-    ev.target.classList.toggle('selected'); 
-});
-Q('#commit').onclick = ev => {
-    Query(`sql/${Q('textarea:first-of-type').textContent}`);
-    Q('textarea:last-of-type').textContent += Q('textarea:first-of-type').textContent;
-    Q('textarea:first-of-type').textContent = '';
-    Q('figure.selected', figure => figure.remove());
-}
-addEventListener('beforeunload', (event) => {
-    event.preventDefault(); // Needed for Chrome
-    event.returnValue = ''; // Triggers the popup
-});
 export {Form, Query};

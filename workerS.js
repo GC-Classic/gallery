@@ -7,7 +7,7 @@ self.addEventListener('fetch', ev => ev.respondWith(
         fetch(ev.request.url.replace('https://gc-classic.github.io', '')) : 
         Routes.headers(ev.request)
 ));
-self.onmessage = ev => connect(port = ev.ports[0]);
+self.onmessage = ev => ev.ports[0] && connect(port = ev.ports[0]);
 
 let workerD, port;
 let connect = () => workerD = Object.assign(port, {
