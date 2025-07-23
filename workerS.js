@@ -10,7 +10,7 @@ self.addEventListener('fetch', ev => ev.respondWith(
 self.onmessage = ev => ev.ports[0] && connect(port = ev.ports[0]);
 
 let workerD, port;
-let connect = () => workerD = Object.assign(port, {
+let connect = () => workerD = console.log(port) ?? Object.assign(port, {
     query: url => new Promise(res => {
         workerD.postMessage(url);
         workerD.addEventListener('message', ev => res(ev.data), {once: true});
