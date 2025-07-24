@@ -55,7 +55,7 @@ const Form = {
                     PI.target.downloaded = true;
                 },
                 hold: hold => hold.for(.5).to((_, target) => {
-                    let char = parseInt(target.dataset.char), figure = target.cloneNode();
+                    let char = parseInt(target.dataset.char), figure = target.cloneNode(true);
                     Image.popup.replaceChildren(figure);
                     char != -1 && figure.append(E('i', {
                         classList: 'char', 
@@ -83,7 +83,7 @@ const Image = {
                 );
                 E('a', {
                     href: canvas.toDataURL('image/png'),
-                    download: figure.Q('figcaption').textContent + '.png'
+                    download: figure.id + '.png'
                 }).click()
             }
         })
@@ -100,13 +100,13 @@ const Query = href =>
 
         Q('#result')[href ? 'replaceChildren' : 'append'](...re.map(({ ID, char, name, desc }) => E('figure', {
             id: ID,
+            title: name,
             dataset: {char},
-            title: name + '\n' + desc,
             '--x': ID % 10, '--y': Math.floor(ID % 100 / 10),
             style: {
                 backgroundImage: `url('https://gc-classic.github.io/item/sprite/${Math.floor(ID / 100) * 100}.png'),linear-gradient(var(--bg),var(--bg))`,
             },
-        }, [E('figcaption', ID)])));
+        }, [E('figcaption', {innerHTML: desc})])));
         Query.offset(re.at(-1).ID);
     })
     .catch(er => [console.error(er), Q('#message').textContent = er.toString()]);  

@@ -72,14 +72,12 @@ figure {
     background-position:calc(100%/9*var(--x)) calc(100%/9*var(--y));
 }
 #result figure {
-    display:inline-flex; justify-content:center; align-items:end;
-    width:3em; height:3em;
+    display:inline-block; width:3em; height:3em;
     --bg:transparent;
     touch-action:pan-y;
 
     figcaption {
-        font-size:.6em; color:silver;
-        line-height:0;
+        display:none;
     }
 }
 #popup {
@@ -95,6 +93,18 @@ figure {
         border-radius:.5em;
         --bg:white;
         position:relative;
+    }
+    figure::before {
+        content:'#'attr(id)' \\\A'attr(title); white-space:pre-wrap;
+        position:absolute; bottom:100%; left:50%; transform:translateX(-50%);
+        font-size:1.4em; text-align:center;
+        width:100%;
+    }
+    figcaption {
+        position:absolute; top:100%; left:50%; transform:translateX(-50%);
+        width:100%;
+        font-size:1.1em;
+        margin-top:.2em;
     }
 }
 figure.selected {
