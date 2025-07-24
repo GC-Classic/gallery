@@ -56,3 +56,15 @@ importScripts('https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.
 
 self.onmessage = ev => (workerS = ev.ports[0]).onmessage = ev => API(ev.data);
 self.sqlite3InitModule().then(DB.open).catch(er => self.postMessage({error: er}))//.finally(() => db.close());
+
+/*
+DROP TABLE IF EXISTS item;
+CREATE TABLE item (
+  ID INTEGER NOT NULL PRIMARY KEY,
+  name TEXT DEFAULT NULL,
+  desc TEXT DEFAULT NULL,
+  char INTEGER NOT NULL,
+  category INTEGER NOT NULL,
+  image INTEGER DEFAULT 0
+);
+*/
