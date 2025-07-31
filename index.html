@@ -1,0 +1,109 @@
+<!DOCTYPE HTML>
+<meta charset=UTF-8>
+<meta name=viewport content='width=device-width,initial-scale=1'>
+<title>SQLite-Wasm</title>
+<link rel="stylesheet" href="https://gc-classic.github.io/common.css" crossorigin="anonymous">
+<link rel="stylesheet" href="index.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Monda:wght@700&amp;family=Shippori+Antique&amp;family=Sofia+Sans+Condensed:wght@600;800&amp;display=swap" rel="stylesheet">
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-FPLGF8M093"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FPLGF8M093');
+</script>
+
+<button id="delete">Delete</button>
+
+<form>
+  <fieldset id="char">
+    <div></div>
+  </fieldset>
+</form>
+<button id="random">Random</button>
+<form><input type="search" placeholder="Search"></form>
+<dialog id="message"></dialog>
+
+<section id="result"></section>
+<div>
+  <textarea style="height:20em"></textarea>
+  <button id="commit">COMMIT</button>
+  <textarea style="height:20em"></textarea>
+</div>
+<dialog id="popup"></dialog>
+
+<script type="module">
+  let workerS, workerD, channel = new MessageChannel();
+
+  navigator.serviceWorker.register('workerS.js', {scope: location.pathname})
+  .then(({installing, active}) => {
+    workerS = installing ?? active;
+    workerS.postMessage('', [channel.port1]);
+    workerD = new Worker(`workerD.js?sqlite3.dir=jswasm&key=${window.location.hash.substring(1)}`);
+    workerD.postMessage('', [channel.port2]);
+    workerD.addEventListener('message', ev => initResult(ev.data));
+  }).catch(console.error);
+
+  import {Q} from 'https://aeoq.github.io/AEOQ.mjs'
+  const initResult = message => {
+    let messageBox = Q('#message');
+    if (typeof message == 'string' || typeof message == 'number')
+      return messageBox.textContent = message;
+
+    if (message.error) {
+      message.error.toString().includes('oo1') && location.reload();
+      messageBox.textContent = `Error: ${message.error}`;
+      throw message.error;
+    }
+    message.done && (messageBox.textContent = message.done);
+  }
+
+</script>
+<script type="module">
+    import { Form, Query } from './index.js'
+    Form.init();
+    Form.events();
+    Query.events();
+
+    import { Q } from 'https://aeoq.github.io/AEOQ.mjs'
+    let ctrl, shift;
+    addEventListener('keydown', ev =>
+      ev.key == ' ' ? document.body.classList.toggle('edit') :
+      ev.key == 'Control' ? ctrl = true :
+      ev.key == 'Shift' ? shift = true :
+      /^[0-9]$/.test(ev.key) ? update(ev.key) :
+      ev.key == 'Backspace' ? update() : ''
+    );
+    addEventListener('keyup', ev =>
+      ev.key == 'Control' ? ctrl = false :
+      ev.key == 'Shift' ? shift = false : ''
+    );
+    const update = numeric => {
+      let cat = Q('figure:nth-child(1 of .selected)').dataset.cat ?? '';
+      cat = numeric ? cat + numeric : cat.slice(0, -1);
+      Q('figure.selected', figure => figure.dataset.cat = cat);
+      let selected = [...document.querySelectorAll('figure.selected')];
+      Q('textarea:first-of-type').textContent = `update item set category=${cat} where id in (${selected.map(figure => figure.id)});`
+      onbeforeunload = ev => ev.preventDefault();
+    }
+    Q('#result').addEventListener('click', ev => {
+      if (!Q('.edit')) return;
+      let [figures, selected] = [[...Q('#result').children], [...document.querySelectorAll('#result .selected')]];
+      if (shift && selected.length >= 1) {
+        let current = figures.indexOf(ev.target);
+        let [start, end] = [figures.indexOf(selected[0]), figures.indexOf(selected.at(-1))];
+        let to = start <= current && end <= current ? start : start > current && end > current ? end : null;
+        figures.slice(Math.min(to, current), Math.max(to, current)).forEach(figure => figure.classList.add('selected'));
+      } else if (!ctrl && !shift)
+        Q('#result .selected', figure => figure != ev.target && figure.classList.remove('selected'));
+      ev.target.classList.toggle('selected');
+    });
+    Q('#commit').onclick = ev => {
+      Query(`sql/${Q('textarea:first-of-type').textContent}`);
+      Q('textarea:last-of-type').textContent += Q('textarea:first-of-type').textContent;
+      Q('textarea:first-of-type').textContent = '';
+      Q('figure.selected', figure => figure.remove());
+    }
+</script>

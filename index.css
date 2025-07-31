@@ -1,0 +1,118 @@
+html {
+    background:#2e3664;
+    padding-top:5em;    
+}
+@keyframes fade {
+    0%,50% {opacity:1;}
+    100% {opacity:0;}
+}
+#message {
+    display:none;
+    position:fixed; top:50%; left:0; transform:translateY(-50%); z-index:2;
+    background:#00000099;
+    padding:1em 0;
+    min-width:100vw;
+    text-align:center;
+
+    &[open] {
+        display:initial;
+        animation:fade 2s forwards;
+        opacity:1;
+    }
+    &::backdrop {background:none;}
+}
+form:first-of-type {
+    position:fixed; top:0; z-index:1;
+    background:#000000dd;
+    max-width:100%;
+    padding-bottom:.25em;
+
+    label:has(:not(:checked)) {filter:saturate(0) brightness(.5);}
+
+    fieldset {display:block;}
+    fieldset div {
+        white-space:nowrap; overflow-x:scroll;
+        scrollbar-width:none;
+        padding-left:.25em; margin:auto;
+
+        label {
+            display:inline-block;
+            &::before {content:attr(title)}
+        }
+    }
+}
+.char {
+    display:inline-block;
+    width:2em; height:2em;
+    background:url(char.png) calc(1% + 13.85%*(var(--x))) calc(1% + 21%*var(--y)) / 950%;
+
+    dialog & {
+        position:absolute; right:.5em; top:.5em;
+    }
+}
+#category div label {
+    margin:0 .25em;
+}
+button {
+    border-radius:9em;
+    background:var(--fg);
+    padding:0 .5em; margin-right:.5em;
+    color:var(--bg);
+}
+form:last-of-type {
+    display:inline;
+    
+    input {font-size:1.1em;}
+}
+figure {
+    background-size:1000%;
+    background-position:calc(100%/9 * mod(var(--id),10)) calc(100%/9 * mod(round(down,var(--id)/10),10));
+}
+#result {max-width:initial;}
+#result figure {
+    display:inline-block; width:3em; height:3em;
+    --bg:transparent;
+    touch-action:pan-y;
+
+    figcaption {display:none;}
+}
+#popup {
+    display:none; justify-content:center; align-items:center;
+    left:0; top:0;
+    min-width:100%; min-height:100%;
+    background:none;
+
+    &[open] {display:flex;}
+    figure {
+        width:12em; height:12em;
+        padding:1em;
+        border-radius:.5em;
+        --bg:white;
+        position:relative;
+    }
+    figure::before {
+        content:'#'attr(id)' \\\A'attr(title); white-space:pre-wrap;
+        position:absolute; bottom:100%; left:50%; transform:translateX(-50%);
+        font-size:1.4em; text-align:center;
+        width:100%;
+    }
+    figcaption {
+        position:absolute; top:100%; left:50%; transform:translateX(-50%);
+        width:100%;
+        font-size:1.1em;
+        margin-top:.2em;
+    }
+}
+figure.selected {
+    border:.1em solid;
+    position:relative;
+
+    &[data-cat]::before {
+        content:attr(data-cat);
+        position:absolute; left:0; top:0;
+        font-size:2em;
+    }
+}
+.edit #result {margin:0;}
+body:not(.edit) #result+div {display:none;}
+.edit #result+div {display:flex;flex-direction: column;position:fixed;right:0;top:5em}
