@@ -78,8 +78,8 @@ const Image = {
             src: figure.style.backgroundImage.match(/https.+?png/)[0],
             onload: ev => {
                 canvas.getContext('2d').drawImage(ev.target, 
-                    E(figure).get('--x')*128, E(figure).get('--y')*128, 128, 128, 
-                    0, 0, 128, 128
+                    E(figure).get('--id')%10*128, Math.floor(E(figure).get('--id')/10)%10*128, 
+                    128, 128, 0, 0, 128, 128
                 );
                 E('a', {
                     href: canvas.toDataURL('image/png'),
