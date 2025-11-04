@@ -1,0 +1,36 @@
+{"category":{
+    "0":"Unclassified",
+    "1":"Consumable",
+    "2":"Mission",
+    "3":"House",
+    "4":"Material",
+
+    "5":"Skill",
+    "6":"Title",
+    "7":"Reinforce",
+    "8":"Card",
+    "9":"Pet",
+
+    "10":"One piece",
+    "11":"Helmet",
+    "12":"U. armor",
+    "13":"L. armor",
+    "14":"Gloves",
+    "15":"Shoes",
+    "16":"Cape",
+    "17":"Weapon",
+    "18":"U head access",
+    "19":"L head access",
+    "20":"U body access",
+    "21":"L body access",
+    "22":"Arm access",
+    "23":"Ring",
+    "24":"Necklace",
+    "25":"Anklet",
+    "26":"Earring",
+    
+    "27":"Chest",
+    "28":"Package"
+
+}
+}
